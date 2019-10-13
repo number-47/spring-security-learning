@@ -42,13 +42,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	 */
 	@Bean
 	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
+		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
 	}
 
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http
+	/*	http
 			.authorizeRequests()
 			.antMatchers("/").permitAll()
 			.and()
@@ -58,37 +58,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.successHandler(authenticationSuccessHandler) // 处理登录成功
 				.failureHandler(authenticationFailureHandler)// 处理登录失败
 			.and()
-			.logout().logoutUrl("/logout").logoutSuccessUrl("/login");
-		/*
-		http
-			.formLogin().
-				loginPage("/authentication/require")// 登录跳转 URL
+			.logout().logoutUrl("/logout").logoutSuccessUrl("/login");*/
+
+		http.formLogin() // 表单登录
+				// http.httpBasic() // HTTP Basic
+				.loginPage("/authentication/require") // 登录跳转 URL
 				.loginProcessingUrl("/login") // 处理表单登录 URL
 				.successHandler(authenticationSuccessHandler) // 处理登录成功
-				.failureHandler(authenticationFailureHandler)
-			.and()
-				.logout().
-				logoutUrl("/logout").
-				logoutSuccessUrl("/login.html")
-			.and()
+				.failureHandler(authenticationFailureHandler) // 处理登录失败
+				.and()
 				.authorizeRequests() // 授权配置
 				.antMatchers("/authentication/require", "/login.html").permitAll() // 登录跳转 URL 无需认证
 				.anyRequest()  // 所有请求
-				.authenticated().and().csrf().disable();;// 都需要认证*/
+				.authenticated() // 都需要认证
+				.and().csrf().disable();
 
 
 	}
 
-	/**
-	 * 在内存中创建一个名为 "user" 的用户，密码为 "password"
-	 * @param auth
-	 * @throws Exception
-	 */
-	@Autowired
-	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-		PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-		auth.inMemoryAuthentication()
-				.withUser("user").password(encoder.encode("password")).roles("USER");
-	}
 
 }

@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
@@ -24,7 +25,8 @@ public class UserDetailService implements UserDetailsService {
 		// 模拟一个用户，替代数据库获取逻辑
 		MyUser user = new MyUser();
 		user.setUserName(username);
-		user.setPassword(this.passwordEncoder.encode("123456"));
+
+		user.setPassword(passwordEncoder.encode("123456"));
 		// 输出加密后的密码
 		System.out.println(user.getPassword());
 		//模拟admin的权限
