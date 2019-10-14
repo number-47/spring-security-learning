@@ -14,7 +14,7 @@
     <div style="text-align: center; margin-top: 10%">
         <img src="https://number-47.github.io/images/avatar.jpg" alt="avatar" class="img-circle" style="margin: 0 auto">
         <p th:text="${username}" style="margin-top: 25px; font-size: 20px; color: crimson">Number</p>
-        <form th:action="@{/logout}" method="post">
+        <form action="/logout" method="post">
             <button class="btn btn-danger" style="margin-top: 20px">退出登录</button>
         </form>
     </div>
