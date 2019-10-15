@@ -1,9 +1,10 @@
 package com.number47.learn.config;
 
-import com.number47.learn.handel.MyAuthenticationFailureHandler;
-import com.number47.learn.handel.MyAuthenticationSucessHandler;
-import com.number47.learn.handel.MyLogOutSuccessHandler;
-import com.number47.learn.service.UserDetailService;
+import com.number47.learn.demo.filter.ValidateCodeFilter;
+import com.number47.learn.demo.handel.MyAuthenticationFailureHandler;
+import com.number47.learn.demo.handel.MyAuthenticationSucessHandler;
+import com.number47.learn.demo.handel.MyLogOutSuccessHandler;
+import com.number47.learn.demo.service.UserDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,17 +12,10 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import javax.annotation.Resource;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * @author number47
@@ -45,6 +39,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private UserDetailService userDetailService;
 
+	@Autowired
+	private ValidateCodeFilter validateCodeFilter;
+
 	/**
 	 * 用于密码加密
 	 * @return
@@ -58,8 +55,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-
-		http.formLogin() // 表单登录
+		//将验证码过滤器添加到添加到UsernamePasswordAuthenticationFilter之前
+		http.addFilterBefore(validateCodeFilter, UsernamePasswordAuthenticationFilter.class)
+				.formLogin() // 表单登录
 		// http.httpBasic() // HTTP Basic
 			.loginPage("/authentication/require") // 登录跳转 URL
 			.loginProcessingUrl("/login") // 处理表单登录 URL
@@ -73,7 +71,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.deleteCookies("JSESSIONID")
 		.and()
 			.authorizeRequests() // 授权配置
-			.antMatchers("/authentication/require", "/login.html").permitAll() // 登录跳转 URL 无需认证
+			.antMatchers("/authentication/require", "/login.html","/code/image").permitAll() //无需认证的请求路径
 			.anyRequest()  // 所有请求
 			.authenticated() // 都需要认证
 		.and().
