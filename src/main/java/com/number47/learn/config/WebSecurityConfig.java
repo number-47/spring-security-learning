@@ -1,5 +1,6 @@
 package com.number47.learn.config;
 
+import com.number47.learn.common.Constant;
 import com.number47.learn.demo.filter.ValidateCodeFilter;
 import com.number47.learn.demo.handel.MyAuthenticationFailureHandler;
 import com.number47.learn.demo.handel.MyAuthenticationSucessHandler;
@@ -16,6 +17,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+
+import javax.sql.DataSource;
 
 /**
  * @author number47
@@ -42,6 +47,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private ValidateCodeFilter validateCodeFilter;
 
+	@Autowired
+	private DataSource dataSource;
+
 	/**
 	 * 用于密码加密
 	 * @return
@@ -50,6 +58,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	public PasswordEncoder passwordEncoder() {
 		PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 		return passwordEncoder;
+	}
+
+	@Bean
+	public PersistentTokenRepository persistentTokenRepository() {
+		JdbcTokenRepositoryImpl jdbcTokenRepository = new JdbcTokenRepositoryImpl();
+		jdbcTokenRepository.setDataSource(dataSource);
+		jdbcTokenRepository.setCreateTableOnStartup(false);
+		return jdbcTokenRepository;
 	}
 
 
@@ -64,6 +80,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.defaultSuccessUrl("/user")
 			.successHandler(authenticationSuccessHandler) // 处理登录成功
 			.failureHandler(authenticationFailureHandler) // 处理登录失败
+		.and()
+			.rememberMe()
+			.tokenRepository(persistentTokenRepository()) // 配置 token 持久化仓库
+			.tokenValiditySeconds(Constant.REMEMBER_ME_TIMES) // remember 过期时间，单为秒
+			.userDetailsService(userDetailService) // 处理自动登录逻辑
 		.and()
 			.logout()
 			.logoutUrl("/logout")
