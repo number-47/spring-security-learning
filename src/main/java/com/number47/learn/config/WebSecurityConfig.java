@@ -1,11 +1,11 @@
 package com.number47.learn.config;
 
 import com.number47.learn.common.Constant;
-import com.number47.learn.demo.filter.ValidateCodeFilter;
-import com.number47.learn.demo.handel.MyAuthenticationFailureHandler;
-import com.number47.learn.demo.handel.MyAuthenticationSucessHandler;
-import com.number47.learn.demo.handel.MyLogOutSuccessHandler;
-import com.number47.learn.demo.service.UserDetailService;
+import com.number47.learn.validate.code.ValidateCodeFilter;
+import com.number47.learn.handel.MyAuthenticationFailureHandler;
+import com.number47.learn.handel.MyAuthenticationSucessHandler;
+import com.number47.learn.handel.MyLogOutSuccessHandler;
+import com.number47.learn.security.browser.UserDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -92,7 +92,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.deleteCookies("JSESSIONID")
 		.and()
 			.authorizeRequests() // 授权配置
-			.antMatchers("/authentication/require", "/login.html","/code/image").permitAll() //无需认证的请求路径
+			.antMatchers("/authentication/require", "/login.html","/code/image","/code/sms").permitAll() //无需认证的请求路径
 			.anyRequest()  // 所有请求
 			.authenticated() // 都需要认证
 		.and().

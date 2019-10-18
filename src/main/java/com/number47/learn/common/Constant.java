@@ -8,6 +8,7 @@ package com.number47.learn.common;
 public class Constant {
 
 	public final static String SESSION_KEY_IMAGE_CODE = "SESSION_KEY_IMAGE_CODE";
+	public final static String SESSION_KEY_SMS_CODE = "SESSION_KEY_SMS_CODE";
 	/**
 	 * 记住我持久化过期时间,单位s
 	 */
